@@ -755,6 +755,15 @@
     for (let i = 0; i < 8;  i++) setTimeout(spawnRain,   i * 260);
   }
 
+  // ——— FALLBACK CLICK: scan all layers for a bubble/rain at click point ———
+  document.addEventListener('click', function (e) {
+    var els = document.elementsFromPoint(e.clientX, e.clientY);
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i].closest('.bubble, .rain') || (els[i].classList && (els[i].classList.contains('bubble') || els[i].classList.contains('rain')) ? els[i] : null);
+      if (el) { burstAndScream(el); return; }
+    }
+  });
+
   // ——— CURSOR TEARDROPS ———
   if (!mobile && !reduced) {
     let lx = 0, ly = 0;
