@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>will you be hard?</title>
+<meta name="description" content="a poem.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink:      #FF3399;
+    --pink-lt:   #FFB3D4;
+    --pink-neon: #FF1493;
+    --blue:      #00C8FF;
+    --blue-lt:   #9EE8FF;
+    --purple:    #A020F0;
+    --purple-d:  #5A0A8A;
+    --indigo:    #2E0A55;
+    --cream:     #FFF0F8;
+    --cream-d:   #E8D4E2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    color: var(--cream);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  body {
+    min-height: 100vh;
+    background:
+      linear-gradient(115deg,
+        #FF3399 0%,
+        #D82AB8 22%,
+        #A020F0 45%,
+        #6A2AD8 68%,
+        #00C8FF 100%);
+    background-size: 220% 220%;
+    background-attachment: fixed;
+    animation: gradient-shift 22s ease-in-out infinite;
+    cursor: crosshair;
+  }
+  @keyframes gradient-shift {
+    0%, 100% { background-position:   0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+
+  ::selection { background: var(--cream); color: var(--pink); }
+
+  /* ——— AMBIENT LAYERS ——— */
+  .bubble-layer, .rain-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bubble-layer { z-index: 1; }
+  .rain-layer   { z-index: 2; }
+
+  .bubble {
+    position: absolute;
+    pointer-events: all;
+    cursor: pointer;
+    will-change: transform, opacity;
+    animation: drift linear forwards;
+  }
+  .bubble svg { width: 100%; height: 100%; display: block; pointer-events: all; }
+  @keyframes drift {
+    0%   { opacity: 0; transform: translate(0,0) rotate(0deg); }
+    15%  { opacity: var(--op, 0.6); }
+    85%  { opacity: var(--op, 0.6); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); }
+  }
+
+  .rain {
+    position: absolute;
+    top: -14vh;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cream);
+    pointer-events: all;
+    cursor: pointer;
+    animation: rainfall linear forwards;
+    filter: url(#wet);
+    text-shadow:
+      0 0 10px rgba(255, 240, 248, 0.18),
+      0 0 22px rgba(255, 51, 153, 0.10);
+    white-space: nowrap;
+    will-change: transform, opacity;
+  }
+  @keyframes rainfall {
+    0%   { transform: translateY(0) rotate(var(--spin, 0deg)); opacity: 0; }
+    10%  { opacity: 0.22; }
+    90%  { opacity: 0.22; }
+    100% { transform: translateY(135vh) rotate(var(--spin, 0deg)); opacity: 0; }
+  }
+
+  /* ——— SIDEBAR (title + refs, fixed left column) ——— */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40vw;
+    height: 100vh;
+    padding: 7vh 2vw 5vh 4.5vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .sidebar > * { pointer-events: auto; }
+
+  .sidebar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(3.8rem, 9vw, 10rem);
+    line-height: 0.88;
+    color: var(--cream);
+    text-shadow:
+      0 0 40px rgba(255, 51, 153, 0.4),
+      0 0 90px rgba(160, 32, 240, 0.3);
+    max-width: 100%;
+    animation: title-breathe 8s ease-in-out infinite;
+  }
+  @keyframes title-breathe {
+    0%, 100% { text-shadow: 0 0 40px rgba(255, 51, 153, 0.4), 0 0 90px rgba(160, 32, 240, 0.3); }
+    50%      { text-shadow: 0 0 55px rgba(255, 51, 153, 0.55), 0 0 120px rgba(160, 32, 240, 0.45); }
+  }
+  .sidebar-title .hard {
+    display: inline-block;
+    color: var(--blue-lt);
+    filter: url(#wet);
+  }
+
+  /* ——— REFS (hidden until hover, staggered reveal) ——— */
+  .sidebar-refs {
+    max-width: 28vw;
+    position: relative;
+    padding-top: 0.5rem;
+    min-height: 160px;
+  }
+  .sidebar-refs::before {
+    content: "*";
+    display: block;
+    font-family: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #39FF14;
+    opacity: 0.55;
+    margin-bottom: 0.6rem;
+    transition: opacity 0.35s ease-out;
+    line-height: 1;
+    width: 1.2em;
+    cursor: help;
+  }
+  .sidebar-refs:hover::before {
+    opacity: 0;
+  }
+  .ref {
+    font-family: 'Space Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    font-size: clamp(0.74rem, 0.88vw, 0.92rem);
+    line-height: 1.45;
+    color: #39FF14;        /* AKR: neon green */
+    padding-left: 1.2em;
+    text-indent: -1.2em;
+    margin-bottom: 0.65rem;
+    letter-spacing: 0.005em;
+    opacity: 0;
+    transform: translateX(-14px);
+    transition:
+      opacity 0.7s ease-out,
+      transform 0.8s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  .sidebar-refs:hover .ref {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .sidebar-refs:hover .ref:nth-of-type(1) { transition-delay: 0.05s; }
+  .sidebar-refs:hover .ref:nth-of-type(2) { transition-delay: 0.32s; }
+  .sidebar-refs:hover .ref:nth-of-type(3) { transition-delay: 0.60s; }
+  .ref em {
+    font-style: italic;
+    font-weight: 600;
+    color: inherit;
+  }
+  .sidebar-refs .ref:nth-of-type(1) {
+    color: #FFFF00;        /* Āṇṭāḷ / Nācciyār Tirumoḻi: neon yellow */
+  }
+  .ref:last-child { margin-bottom: 0; }
+
+  /* ——— MAIN (stanza column, right of sidebar) ——— */
+  main {
+    position: relative;
+    z-index: 10;
+    margin-left: 40vw;
+    width: 60vw;
+    pointer-events: none;  /* clicks pass through empty slide areas to the falling objects behind */
+  }
+
+  .slide {
+    width: 60vw;
+    height: 92vh;
+    display: flex;
+    align-items: center;
+    padding: 0 4vw;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .line-slide {
+    padding-left: 4vw;
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4vh;
+  }
+  .stanza {
+    display: flex;
+    flex-direction: column;
+    gap: 0.42em;
+    max-width: 52vw;
+    opacity: 0;
+    transform: translateX(80px);    /* default: enter from right */
+    transition:
+      opacity 1s ease-out,
+      transform 1.3s cubic-bezier(0.16, 0.84, 0.3, 1);
+    will-change: transform, opacity;
+    position: relative;
+    z-index: 2;
+  }
+  /* alternating side entries: stanza 2 from left, stanza 3 from right */
+  .line-slide:nth-child(2) .stanza { transform: translateX(-80px); }
+  .line-slide:nth-child(3) .stanza { transform: translateX(80px); }
+  .stanza { pointer-events: auto; }  /* poem text stays selectable */
+  .line-slide .stanza.in-view {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ——— PEEK (faded preview of next stanza, below current) ——— */
+  .stanza-peek {
+    max-width: 52vw;
+    opacity: 0.5;
+    pointer-events: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    color: var(--cream);
+    transition: opacity 0.7s ease-out;
+    margin-top: 1vh;
+  }
+  .stanza-peek.hidden { opacity: 0; }
+  .stanza-peek p {
+    font-size: clamp(0.88rem, 1.25vw, 1.2rem);
+    line-height: 1.32;
+    margin: 0.3em 0;
+  }
+  .stanza-peek em {
+    font-style: italic;
+    color: var(--pink-lt);
+  }
+  .line-slide .line {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(1.2rem, 2.7vw, 2.15rem);
+    line-height: 1.25;
+    color: var(--cream);
+    text-shadow:
+      0 0 22px rgba(255, 240, 248, 0.3),
+      0 4px 18px rgba(46, 10, 85, 0.7);
+  }
+  .line-slide .line .w {
+    font-style: italic;
+    color: var(--pink-lt);
+    display: inline-block;
+    filter: url(#wet);
+  }
+
+  .scream {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(1.3rem, 2.2vw, 2.4rem);
+    color: #FFFF00;
+    text-shadow:
+      0 0 10px rgba(255, 255, 0, 0.75),
+      0 0 26px rgba(255, 51, 153, 0.55),
+      0 0 48px rgba(160, 32, 240, 0.4);
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    animation: scream-rise 2.6s ease-out forwards;
+    filter: url(#wet);
+    letter-spacing: 0.01em;
+  }
+  @keyframes scream-rise {
+    0%   { opacity: 0; transform: translate(-50%, -50%)  scale(0.6); }
+    12%  { opacity: 1; transform: translate(-50%, -90%)  scale(1);   }
+    78%  { opacity: 1; transform: translate(-50%, -190%) scale(1.05);}
+    100% { opacity: 0; transform: translate(-50%, -230%) scale(1.12);}
+  }
+
+  /* ——— CURSOR ——— */
+  .cursor-drop {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 240, 248, 0.9);
+    border-radius: 0 50% 50% 50%;
+    transform: rotate(45deg);
+    pointer-events: none;
+    z-index: 9999;
+    animation: dfall 1s ease-in forwards;
+    margin: -3px 0 0 -3px;
+    box-shadow:
+      0 0 10px rgba(255, 51, 153, 0.7),
+      0 0 22px rgba(0, 200, 255, 0.4);
+  }
+  @keyframes dfall {
+    0%   { opacity: 0.9; transform: rotate(45deg) translate(0,0) scale(1); }
+    100% { opacity: 0;   transform: rotate(45deg) translate(0,20px) scale(0.35); }
+  }
+
+  /* ——— MOBILE (sidebar becomes top banner, refs move to bottom) ——— */
+  @media (max-width: 860px) {
+    html, body { cursor: auto; }
+    .sidebar {
+      position: static;
+      width: 100vw;
+      height: auto;
+      padding: 8vh 6vw 4vh;
+      display: block;
+    }
+    .sidebar-title {
+      font-size: clamp(2.4rem, 10vw, 4rem);
+      margin-bottom: 2.5rem;
+      max-width: none;
+    }
+    /* hide sidebar refs — JS moves them to end of page */
+    .sidebar-refs { display: none; }
+    main { margin-left: 0; width: 100vw; pointer-events: auto; }
+    .slide { width: 100vw; height: auto; min-height: 50vh; padding: 6vh 6vw; }
+    .line-slide {
+      padding-left: 6vw;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2vh;
+    }
+    .stanza { max-width: 90vw; }
+    .line-slide .line { font-size: clamp(1.2rem, 5vw, 1.8rem); }
+    /* stanzas start faded, brighten when scrolled to */
+    .slide .stanza {
+      transform: none !important;
+      opacity: 0.3 !important;
+      transition: opacity 0.9s ease-out !important;
+    }
+    .slide .stanza.in-view {
+      opacity: 1 !important;
+    }
+    /* hide peek duplicates on mobile — stanzas themselves serve as "peeks" */
+    .stanza-peek { display: none; }
+    /* mobile refs block (appended by JS) */
+    .mobile-refs {
+      padding: 5vh 6vw 8vh;
+      width: 100vw;
+      max-width: none;
+    }
+    .mobile-refs .ref {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+      font-size: 0.82rem;
+      margin-bottom: 0.8rem;
+    }
+    .mobile-refs::before { display: none; }
+  }
+
+  /* ——— REDUCED MOTION ——— */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; }
+    .rain-layer, .bubble-layer { display: none; }
+    .slide .stanza { transform: none !important; opacity: 1 !important; }
+  }
+
+  /* ——— PRINT ——— */
+  @media print {
+    body { background: #fff; color: #000; animation: none; }
+    .rain-layer, .bubble-layer, .cursor-drop { display: none; }
+    .sidebar { position: static; width: auto; height: auto; padding: 2rem; }
+    main { margin-left: 0; width: auto; }
+    .slide { height: auto; page-break-inside: avoid; padding: 1rem 2rem; width: auto; }
+    .slide .stanza { transform: none !important; opacity: 1 !important; }
+    .sidebar-title, .line-slide .line, .ref { color: #000; text-shadow: none; }
+    .w, .hard { filter: none; color: #000; }
+    .ref { color: #000; }
+    .ref em { color: #000; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= SVG DEFS ================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="wet" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018 0.045" numOctaves="2" seed="4">
+        <animate attributeName="baseFrequency"
+                 values="0.018 0.045; 0.024 0.055; 0.018 0.045"
+                 dur="6s" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="5"/>
+    </filter>
+
+    <radialGradient id="g-honey" cx="35%" cy="30%" r="70%">
+      <stop offset="0%"   stop-color="#FFE58A"/>
+      <stop offset="60%"  stop-color="#F5B53A"/>
+      <stop offset="100%" stop-color="#B8700A"/>
+    </radialGradient>
+
+    <symbol id="s-bubble" viewBox="0 0 30 30">
+      <circle cx="15" cy="15" r="12" fill="none" stroke="#FFF0F8" stroke-width="0.9"/>
+      <circle cx="11" cy="10" r="2.2" fill="#FFF0F8" opacity="0.65"/>
+    </symbol>
+    <symbol id="s-drop" viewBox="0 0 30 30">
+      <path d="M15 3 C 15 3 6 14 6 19 A 9 9 0 0 0 24 19 C 24 14 15 3 15 3 Z" fill="#FFF0F8"/>
+    </symbol>
+    <symbol id="s-spark" viewBox="0 0 30 30">
+      <path d="M15 2 L 17 13 L 28 15 L 17 17 L 15 28 L 13 17 L 2 15 L 13 13 Z" fill="#9EE8FF"/>
+    </symbol>
+    <symbol id="s-lips" viewBox="0 0 30 30">
+      <path d="M3 15 Q 9 7 15 13 Q 21 7 27 15 Q 21 21 15 17 Q 9 21 3 15 Z" fill="#FFB3D4"/>
+    </symbol>
+
+    <symbol id="s-rose" viewBox="0 0 30 30">
+      <path d="M15 5 C 22 5 25 11 22 16 C 25 21 22 25 15 25 C 8 25 5 21 8 16 C 5 11 8 5 15 5 Z"
+            fill="#FF3399" opacity="0.85"/>
+      <path d="M15 10 C 19 10 20 13 19 15 C 20 17 19 20 15 20 C 11 20 10 17 11 15 C 10 13 11 10 15 10 Z"
+            fill="#FFB3D4"/>
+      <circle cx="15" cy="15" r="1.8" fill="#5A0A8A"/>
+    </symbol>
+
+    <symbol id="s-honey" viewBox="0 0 30 30">
+      <path d="M15 3 C 15 3 6 14 6 19 A 9 9 0 0 0 24 19 C 24 14 15 3 15 3 Z" fill="url(#g-honey)"/>
+      <ellipse cx="11" cy="15" rx="2.4" ry="1.4" fill="#FFF3C4" opacity="0.85"/>
+    </symbol>
+
+    <symbol id="s-milk" viewBox="0 0 30 30">
+      <path d="M15 3 C 15 3 6 14 6 19 A 9 9 0 0 0 24 19 C 24 14 15 3 15 3 Z" fill="#FFFBF6"/>
+      <circle cx="12" cy="13" r="2" fill="#FFE8F0" opacity="0.75"/>
+    </symbol>
+
+    <!-- conch shell (spiral) -->
+    <symbol id="s-conch" viewBox="0 0 30 30">
+      <path d="M 16 4 Q 26 4 26 15 Q 26 26 14 26 Q 4 26 4 16 Q 4 8 12 8 Q 20 8 20 15 Q 20 22 14 22 Q 10 22 10 18"
+            fill="none" stroke="#FFF0F8" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- fire / flame -->
+    <symbol id="s-fire" viewBox="0 0 30 30">
+      <path d="M15 2 C 15 2 7 13 7 19 C 7 25 10 28 15 28 C 20 28 23 25 23 19 C 23 13 15 2 15 2 Z"
+            fill="#FF6B3D" opacity="0.9"/>
+      <path d="M15 10 C 15 10 10 17 10 21 C 10 25 12 27 15 27 C 18 27 20 25 20 21 C 20 17 15 10 15 10 Z"
+            fill="#FFDD44"/>
+      <ellipse cx="15" cy="22" rx="2.2" ry="3" fill="#FFF0F8" opacity="0.75"/>
+    </symbol>
+
+    <!-- saptapadi: seven footprints in a gentle arc -->
+    <symbol id="s-saptapadi" viewBox="0 0 30 30">
+      <g fill="#FFB3D4">
+        <ellipse cx="3"  cy="24" rx="1.2" ry="2.1" transform="rotate(-30 3 24)"/>
+        <ellipse cx="6"  cy="20" rx="1.2" ry="2.1" transform="rotate(-20 6 20)"/>
+        <ellipse cx="10" cy="17" rx="1.2" ry="2.1" transform="rotate(-10 10 17)"/>
+        <ellipse cx="15" cy="15" rx="1.2" ry="2.1"/>
+        <ellipse cx="20" cy="17" rx="1.2" ry="2.1" transform="rotate(10 20 17)"/>
+        <ellipse cx="24" cy="20" rx="1.2" ry="2.1" transform="rotate(20 24 20)"/>
+        <ellipse cx="27" cy="24" rx="1.2" ry="2.1" transform="rotate(30 27 24)"/>
+      </g>
+    </symbol>
+
+    <symbol id="s-saffron" viewBox="0 0 30 30">
+      <path d="M 5 7 Q 11 13 14 19 Q 17 24 22 23"
+            fill="none" stroke="#E82A4C" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M 6 8 Q 12 14 15 20 Q 18 24 22 22"
+            fill="none" stroke="#FF6B95" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>
+    </symbol>
+
+    <symbol id="s-chandanam" viewBox="0 0 30 30">
+      <path d="M 8 12 Q 5 9 10 7 Q 15 6 19 8 Q 23 10 24 14 Q 25 20 20 23 Q 14 25 10 22 Q 6 19 8 14 Z"
+            fill="#D4B078"/>
+      <path d="M 10 12 Q 8 10 12 9 Q 16 8 18 10 Q 21 12 21 15 Q 22 19 17 20 Q 13 21 11 18 Q 9 16 10 13 Z"
+            fill="#E8C88E" opacity="0.7"/>
+      <ellipse cx="12" cy="11" rx="1.8" ry="1" fill="#FFEBC4" opacity="0.85"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="bubble-layer" id="ambient" aria-hidden="true"></div>
+<div class="rain-layer"   id="rain"    aria-hidden="true"></div>
+
+<aside class="sidebar">
+  <h1 class="sidebar-title"><em>will you<br>be</em> <span class="hard">hard?</span></h1>
+
+  <div class="sidebar-refs" aria-label="references">
+    <p class="ref">Āṇṭāḷ. <em>Nācciyār Tirumoḻi</em>. In <em>Nālāyira Tivya Prabandham</em>. c. 9th century.</p>
+    <p class="ref">Ramanujan, A. K. <em>Selected Poetry</em>. Compiled by A. K. Ramanujan. Includes poems from <em>The Striders</em> (1966), <em>Relations</em> (1971), <em>Second Sight</em> (1986), and <em>The Black Hen</em> (1995).</p>
+  </div>
+</aside>
+
+<main>
+
+  <section class="slide line-slide">
+    <div class="stanza">
+      <p class="line"><span class="w">wet</span>, parched for you</p>
+      <p class="line">virginally <span class="w">wet</span>, for my flute in the clouds</p>
+      <p class="line"><span class="w">wetter</span> still, thinking of your thin lips</p>
+      <p class="line">minoxidil, maybe? don't care, i'm <span class="w">wet</span></p>
+      <p class="line">no peptides for selective mutism,</p>
+      <p class="line">but i'm so extra <span class="w">(wet)</span>, drown in the shortchange?</p>
+      <p class="line">blow your conch away?</p>
+    </div>
+    <div class="stanza-peek" aria-hidden="true">
+      <p>it's vital to ask me only in dead languages,</p>
+      <p>feel my <em>(wet)</em> yes with your thin lips</p>
+      <p>so <em>wet</em> (i'm glad i'm an unbeliever)</p>
+    </div>
+  </section>
+
+  <section class="slide line-slide">
+    <div class="stanza">
+      <p class="line">it's vital to ask me only in dead languages,</p>
+      <p class="line">feel my <span class="w">(wet)</span> yes with your thin lips</p>
+      <p class="line">so <span class="w">wet</span> (i'm glad i'm an unbeliever)</p>
+      <p class="line">truth is pathless, i'm ruinously lost</p>
+      <p class="line">speak to me in riddles, poems, tongues</p>
+      <p class="line">on my very <span class="w">wet</span> lips</p>
+      <p class="line">your feet, on my warm <span class="w">wet</span> lips</p>
+    </div>
+    <div class="stanza-peek" aria-hidden="true">
+      <p>honey, milk, saffron, roses, my very <em>wet</em> lips</p>
+      <p>on your feet, all day, get back</p>
+      <p>to my very stiff nips</p>
+    </div>
+  </section>
+
+  <section class="slide line-slide">
+    <div class="stanza">
+      <p class="line">honey, milk, saffron, roses, my very <span class="w">wet</span> lips</p>
+      <p class="line">on your feet, all day, get back</p>
+      <p class="line">to my very stiff nips</p>
+      <p class="line">be my friend, walk with me</p>
+      <p class="line">seven little trips</p>
+      <p class="line">through thick and thin lips</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile  = matchMedia('(max-width: 860px)').matches;
+
+  // ——— STANZA REVEAL + PEEK HIDE ———
+  const allStanzas = Array.from(document.querySelectorAll('.stanza'));
+  const allPeeks   = Array.from(document.querySelectorAll('.stanza-peek'));
+  if (reduced) {
+    allStanzas.forEach(s => s.classList.add('in-view'));
+    allPeeks.forEach(p => p.classList.add('hidden'));
+  } else {
+    // IO runs on both desktop and mobile — stanzas fade in on scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in-view');
+          // hide the PREVIOUS slide's peek so no duplication (desktop only)
+          if (!mobile) {
+            const idx = allStanzas.indexOf(e.target);
+            if (idx > 0 && allPeeks[idx - 1]) {
+              allPeeks[idx - 1].classList.add('hidden');
+            }
+          }
+        }
+      });
+    }, { rootMargin: mobile ? '-18% 0px -18% 0px' : '-12% 0px -12% 0px', threshold: 0 });
+    allStanzas.forEach(s => io.observe(s));
+  }
+
+  // ——— MOBILE: move refs to end of page ———
+  if (mobile) {
+    const refs = document.querySelector('.sidebar-refs');
+    if (refs) {
+      const mobileRefs = refs.cloneNode(true);
+      mobileRefs.className = 'mobile-refs';
+      document.body.appendChild(mobileRefs);
+    }
+  }
+
+  // ——— CLICK → BURST + SCREAM ———
+  // Short fragments: Āṇṭāḷ via Venkatesan (UC Davis faculty page),
+  // A.K. Ramanujan from Selected Poetry (this directory). Fair-use length.
+  const PHRASES = [
+    // Āṇṭāḷ — Nācciyār Tirumoḻi
+    "tears between my breasts",
+    "the fire of desire",
+    "my young breasts yearn",
+    "entered me, consumed me",
+    "vermilion on my breasts",
+    "awake in the thick of night",
+    "he destroyed my womanhood",
+    "I waste away",
+    "stole my well-being",
+    // A.K. Ramanujan — Pleasure
+    "the wet places never dry",
+    "thirsting for breast, buttock",
+    "self touching self",
+    "body with honey, thick and slow",
+    "loosening into petal, stamen",
+    "all philosophy slimed",
+    "pleasure, pleasure, Great Pleasure!",
+    "once naked, once even intangible",
+    // A.K. Ramanujan — other poems
+    "the shape of her bite",
+    "her hair as silk in my hand",
+    "exploration of bays",
+    "a perfect coupling with naked nothing",
+    "the lunging pits of her feeling",
+    "a brood of scarlet figs",
+    "spread-eagled, pinned by wind"
+  ];
+
+  function burstAndScream(target) {
+    const rect = target.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    // radial burst of teardrops
+    for (let i = 0; i < 22; i++) {
+      const angle = (i / 22) * Math.PI * 2 + Math.random() * 0.35;
+      const dist  = 26 + Math.random() * 100;
+      const d = document.createElement('span');
+      d.className = 'cursor-drop';
+      d.style.left = (cx + Math.cos(angle) * dist) + 'px';
+      d.style.top  = (cy + Math.sin(angle) * dist) + 'px';
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 1000);
+    }
+
+    // scream a phrase
+    const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+    const s = document.createElement('span');
+    s.className = 'scream';
+    s.textContent = phrase;
+    s.style.left = cx + 'px';
+    s.style.top  = cy + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 2650);
+
+    // the clicked element pops
+    target.remove();
+  }
+
+  // ——— FALLING OBJECTS + WORD RAIN ———
+  const ambient = document.getElementById('ambient');
+  const rain    = document.getElementById('rain');
+  const SHAPES  = [
+    's-rose','s-rose','s-rose',
+    's-chandanam','s-chandanam','s-chandanam',
+    's-honey','s-honey',
+    's-milk','s-milk',
+    's-conch','s-conch',
+    's-fire','s-fire',
+    's-saptapadi','s-saptapadi',
+    's-saffron',
+    's-drop','s-drop',
+    's-bubble',
+    's-lips','s-spark'
+  ];
+  const WORDS   = [
+    'wet','wet','wet','(wet)','wetter','so wet','very wet',
+    'roses','honey','milk',
+    'roses','honey','milk',
+    'saffron'
+  ];
+  const MAX_BUBBLES = mobile ? 14 : 30;
+  const MAX_RAIN    = mobile ? 10 : 22;
+
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+  function spawnBubble() {
+    if (ambient.childElementCount >= MAX_BUBBLES) return;
+    const s = document.createElement('div');
+    s.className = 'bubble';
+    const size = rand(22, 78);
+    s.style.width  = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = rand(-5, 100) + 'vw';
+    s.style.top  = rand(-20, -5) + 'vh';
+    s.style.setProperty('--dx',  rand(-12, 12).toFixed(1) + 'vw');
+    s.style.setProperty('--dy',  rand(115, 160).toFixed(1) + 'vh');
+    s.style.setProperty('--rot', rand(-220, 220).toFixed(0) + 'deg');
+    s.style.setProperty('--op',  rand(0.45, 0.85).toFixed(2));
+    const dur = rand(8, 16);
+    s.style.animationDuration = dur + 's';
+    s.innerHTML =
+      '<svg viewBox="0 0 30 30" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">' +
+      '<use href="#' + pick(SHAPES) + '"/></svg>';
+    s.style.pointerEvents = 'all';
+    s.style.cursor = 'pointer';
+    s.onclick = function (e) {
+      e.stopPropagation();
+      burstAndScream(s);
+    };
+    ambient.appendChild(s);
+    setTimeout(() => s.remove(), dur * 1000 + 200);
+  }
+
+  function spawnRain() {
+    if (rain.childElementCount >= MAX_RAIN) return;
+    const w = document.createElement('span');
+    w.className = 'rain';
+    w.textContent = pick(WORDS);
+    w.style.left = rand(0, 100) + 'vw';
+    w.style.fontSize = rand(20, 84) + 'px';
+    const dur = rand(6, 13);
+    w.style.animationDuration = dur + 's';
+    w.style.setProperty('--spin', rand(-16, 16) + 'deg');
+    w.style.pointerEvents = 'all';
+    w.style.cursor = 'pointer';
+    w.onclick = function (e) {
+      e.stopPropagation();
+      burstAndScream(w);
+    };
+    rain.appendChild(w);
+    setTimeout(() => w.remove(), dur * 1000 + 200);
+  }
+
+  if (!reduced) {
+    setInterval(spawnBubble, 420);
+    setInterval(spawnRain,   780);
+    for (let i = 0; i < 20; i++) setTimeout(spawnBubble, i * 140);
+    for (let i = 0; i < 8;  i++) setTimeout(spawnRain,   i * 260);
+  }
+
+  // ——— CURSOR TEARDROPS ———
+  if (!mobile && !reduced) {
+    let lx = 0, ly = 0;
+    document.addEventListener('mousemove', function (e) {
+      const dx = e.clientX - lx, dy = e.clientY - ly;
+      if (Math.hypot(dx, dy) < 38) return;
+      lx = e.clientX; ly = e.clientY;
+      const d = document.createElement('span');
+      d.className = 'cursor-drop';
+      d.style.left = e.clientX + 'px';
+      d.style.top  = e.clientY + 'px';
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 1000);
+    }, { passive: true });
+  }
+})();
+</script>
+</body>
+</html>
